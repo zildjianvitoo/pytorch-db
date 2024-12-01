@@ -2,3 +2,4 @@
 data
 CIFAR10_data
 *.pt
+__pycache__

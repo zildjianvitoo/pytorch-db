@@ -25,5 +25,7 @@ def create_dataloaders(
     test_dataloader = DataLoader(
         dataset=test_data, batch_size=batch_size, num_workers=num_workers,pin_memory=True
     )
+    
+    len(train_dataloader)
 
     return train_dataloader,test_dataloader,class_names
