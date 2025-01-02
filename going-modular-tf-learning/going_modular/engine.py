@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 from torchmetrics import Metric
+from tqdm.auto import tqdm
 
 
 def train_step(
@@ -16,7 +17,9 @@ def train_step(
     train_loss = 0
     acc_metric.reset(),
 
-    for X, y in data_loader:
+    progress_bar = tqdm(data_loader, desc="Training", leave=False)
+
+    for X, y in progress_bar:
         X, y = X.to(device), y.to(device)
         y_logits = model(X)
         y_preds = torch.softmax(y_logits, dim=1)
@@ -28,6 +31,8 @@ def train_step(
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+
+        progress_bar.set_postfix({"Batch Loss": loss.item()})
 
     train_loss /= len(data_loader)
     train_acc = acc_metric.compute()
@@ -47,8 +52,10 @@ def test_step(
     test_loss = 0
     acc_metric.reset(),
 
+    progress_bar = tqdm(data_loader, desc="Testing", leave=False)
+
     with torch.inference_mode():
-        for X, y in data_loader:
+        for X, y in progress_bar:
             X, y = X.to(device), y.to(device)
             y_logits = model(X)
             y_preds = torch.softmax(y_logits, dim=1)
@@ -56,6 +63,8 @@ def test_step(
             loss = loss_fn(y_logits, y)
             test_loss += loss
             acc_metric.update(y_preds, y)
+
+            progress_bar.set_postfix({"Batch Loss": loss.item()})
 
         total_loss = test_loss / len(data_loader)
         test_acc = acc_metric.compute()
