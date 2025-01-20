@@ -3,6 +3,10 @@ from torch import nn
 from torchmetrics import Metric
 from tqdm.auto import tqdm
 
+from torch.utils.tensorboard import SummaryWriter
+
+writer = SummaryWriter()
+
 
 def train_step(
     model: nn.Module,
@@ -92,6 +96,20 @@ def train_model(
         )
         test_loss, test_acc = test_step(
             model, test_dataloader, loss_fn, acc_metric, device
+        )
+
+        writer.add_scalars(
+            main_tag="Loss",
+            tag_scalar_dict={"train_loss": train_loss, "test_loss": test_loss},
+            global_step=epoch,
+        )
+        writer.add_scalars(
+            main_tag="Accuracy",
+            tag_scalar_dict={"train_acc": train_acc, "test_acc": test_acc},
+            global_step=epoch,
+        )
+        writer.add_graph(
+            model=model, input_to_model=torch.randn(32, 3, 224, 224).to(device)
         )
 
         results["train_loss"].append(train_loss.item())
