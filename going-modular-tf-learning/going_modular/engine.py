@@ -5,6 +5,7 @@ from tqdm.auto import tqdm
 
 from torch.utils.tensorboard import SummaryWriter
 
+
 writer = SummaryWriter()
 
 
@@ -89,6 +90,10 @@ def train_model(
     model.to(device)
     results = {"train_loss": [], "train_acc": [], "test_loss": [], "test_acc": []}
 
+    writer.add_graph(
+        model=model, input_to_model=torch.randn(32, 3, 224, 224).to(device)
+    )
+
     for epoch in range(epochs):
         print(f"\nEpoch: {epoch}")
         train_loss, train_acc = train_step(
@@ -108,9 +113,6 @@ def train_model(
             tag_scalar_dict={"train_acc": train_acc, "test_acc": test_acc},
             global_step=epoch,
         )
-        writer.add_graph(
-            model=model, input_to_model=torch.randn(32, 3, 224, 224).to(device)
-        )
 
         results["train_loss"].append(train_loss.item())
         results["train_acc"].append(train_acc.item())
@@ -119,4 +121,5 @@ def train_model(
 
         print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f}")
         print(f"Test Loss: {test_loss:.4f} | Test Acc: {test_acc:.4f}")
+    writer.close()
     return results
