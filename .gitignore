@@ -3,3 +3,4 @@ data
 CIFAR10_data
 *.pt
 __pycache__
+events.*

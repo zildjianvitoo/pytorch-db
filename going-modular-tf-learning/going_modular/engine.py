@@ -6,9 +6,6 @@ from tqdm.auto import tqdm
 from torch.utils.tensorboard import SummaryWriter
 
 
-writer = SummaryWriter()
-
-
 def train_step(
     model: nn.Module,
     data_loader: torch.utils.data.Dataset,
@@ -84,6 +81,7 @@ def train_model(
     loss_fn: nn.Module,
     acc_metric: Metric,
     optimizer: torch.optim.Optimizer,
+    writer: SummaryWriter,
     device,
     epochs=5,
 ):
